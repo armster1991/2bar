@@ -3,371 +3,277 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calculadora de Ângulo Precisa</title>
+<title>Calculadora de Ângulo 2 Barras - Gunbound</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-  /* Reset */
-  * {
-    box-sizing: border-box;
-    margin: 0; padding: 0;
-  }
-  html, body {
+  body {
+    margin: 0;
     height: 100vh;
-    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(90deg, #2b2f4a 0%, #1c2137 100%);
+    font-family: 'Share Tech Mono', monospace;
     color: white;
     overflow: hidden;
-    user-select: none;
-    background: #101820;
-    background-image:
-      radial-gradient(circle at left center, rgba(255,0,0,0.15) 0%, transparent 70%),
-      radial-gradient(circle at right center, rgba(0,255,0,0.15) 0%, transparent 70%);
+    position: relative;
   }
 
-  /* Animação "fios elétricos" sutil */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(
-        90deg,
-        rgba(255,0,0,0.07) 0, rgba(255,0,0,0.07) 2px,
-        transparent 3px, transparent 8px
-      ),
-      repeating-linear-gradient(
-        90deg,
-        rgba(0,255,0,0.07) 0, rgba(0,255,0,0.07) 2px,
-        transparent 3px, transparent 8px
-      );
-    animation: flowElectric 10s linear infinite;
-    z-index: 0;
-  }
-  @keyframes flowElectric {
-    0% { background-position: 0 0, 0 0; }
-    100% { background-position: 200px 0, -200px 0; }
-  }
-
-  /* --- Ângulo no topo --- */
-  #angleDisplay {
+  header {
     text-align: center;
-    font-size: 5rem;
-    padding: 1.2rem 0;
-    z-index: 10;
-    color: white;
-    text-shadow:
-      0 0 6px #0ff,
-      0 0 15px #0ffccf;
+    margin: 1rem auto 2rem;
+    font-size: 3rem;
+    letter-spacing: 2px;
+    user-select: none;
   }
 
-  /* --- Régua inferior --- */
-  #rulerContainer {
+  .angle-display {
+    font-weight: bold;
+    color: #a2d5f2;
+    text-shadow: 0 0 5px #4a90e2;
+  }
+
+  /* Régua */
+  .ruler-container {
     position: fixed;
-    bottom: 20px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     width: 800px;
     height: 40px;
-    background: linear-gradient(90deg, #004466, #0077aa);
-    border-radius: 8px;
-    box-shadow:
-      0 0 8px #00caffaa inset;
-    cursor: crosshair;
+    background: linear-gradient(90deg, #3a4a68 0%, #2c3a59 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 10px #3a4a68;
     display: flex;
-    overflow: hidden;
     user-select: none;
-    z-index: 10;
   }
 
-  /* Segmentos da régua: 20 divisões visuais */
-  .rulerSegment {
+  .ruler-segment {
     flex: 1;
-    border-right: 1px solid rgba(255 255 255 / 0.12);
+    border-right: 1px solid #556a8a;
     position: relative;
+    cursor: pointer;
   }
-  .rulerSegment:last-child {
+  .ruler-segment:last-child {
     border-right: none;
   }
-  .rulerSegment::after {
-    content: '';
-    position: absolute;
-    top: 6px;
-    right: 0;
-    height: 28px;
-    width: 1px;
-    background: rgba(255 255 255 / 0.12);
+
+  .ruler-segment:hover,
+  .ruler-segment.active {
+    background: #4db6ac;
+    box-shadow: 0 0 10px #26a69a;
   }
 
-  /* Sobreposição progressiva */
-  #rulerProgress {
+  .ruler-segment.illuminated {
+    background: #4db6ac;
+  }
+
+  /* Barra iluminada da régua até o mouse */
+  .ruler-fill {
     position: absolute;
+    height: 100%;
     top: 0;
     left: 0;
-    height: 40px;
-    width: 0;
-    background: linear-gradient(90deg, #00d2ff, #006fbb);
-    box-shadow:
-      0 0 12px #00d2ff,
-      inset 0 0 12px #00aaff;
-    border-radius: 8px 0 0 8px;
+    background: linear-gradient(90deg, #26a69a 0%, #4db6ac 100%);
     pointer-events: none;
-    transition: width 0.05s linear;
+    border-radius: 10px 0 0 10px;
+    z-index: 1;
+    transition: width 0.1s ease-out;
   }
 
-  /* --- Botões vento --- */
-  #windsLeft, #windsRight {
+  /* Container dos botões vento */
+  .wind-container {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    display: grid;
-    grid-template-columns: 1fr;
-    row-gap: 6px;
-    max-height: 95vh;
-    padding: 6px 4px;
-    z-index: 10;
+    display: flex;
+    height: 70vh;
     user-select: none;
-  }
-  #windsLeft {
-    left: 8px;
-  }
-  #windsRight {
-    right: 8px;
+    font-weight: bold;
+    font-size: 1rem;
   }
 
-  .windBtn {
-    width: 40px;
-    height: 28px;
-    line-height: 28px;
-    font-weight: 700;
-    font-size: 1.05rem;
-    border-radius: 6px;
-    box-shadow:
-      inset 0 0 6px rgba(0,0,0,0.7);
+  .wind-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    height: 100%;
+  }
+
+  .wind-side.left {
+    left: 10px;
+  }
+
+  .wind-side.right {
+    right: 10px;
+  }
+
+  .wind-button {
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
-    transition:
-      background-color 0.3s ease,
-      box-shadow 0.3s ease,
-      color 0.3s ease;
-    color: white;
+    transition: box-shadow 0.3s ease;
     text-align: center;
-    background: linear-gradient(135deg, #003300, #006600);
+    color: white;
     user-select: none;
   }
-  .windBtn.red {
-    background: linear-gradient(135deg, #660000, #990000);
+
+  /* Cores vento a favor (verde) e contra (vermelho) */
+  .wind-favor {
+    background: linear-gradient(135deg, #00796b, #004d40);
   }
-  .windBtn.green {
-    background: linear-gradient(135deg, #004400, #00aa00);
+  .wind-contra {
+    background: linear-gradient(135deg, #b71c1c, #7f0000);
   }
 
-  /* Pulsar animação */
-  @keyframes pulseGreen {
-    0%, 100% {
-      box-shadow:
-        0 0 8px #00ff00aa,
-        inset 0 0 10px #00ff00aa;
-      background-color: #007700;
-      color: #ccffcc;
-    }
-    50% {
-      box-shadow:
-        0 0 18px #00ff00ee,
-        inset 0 0 24px #00ff00ee;
-      background-color: #00bb00;
-      color: #ddffdd;
-    }
+  /* Pulsar animado quando ativo */
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 8px #26a69a; }
+    50% { box-shadow: 0 0 20px #4db6ac; }
   }
-  @keyframes pulseRed {
-    0%, 100% {
-      box-shadow:
-        0 0 8px #ff0000aa,
-        inset 0 0 10px #ff0000aa;
-      background-color: #770000;
-      color: #ffbbbb;
-    }
-    50% {
-      box-shadow:
-        0 0 18px #ff0000ee,
-        inset 0 0 24px #ff0000ee;
-      background-color: #cc0000;
-      color: #ffdddd;
-    }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 8px #e53935; }
+    50% { box-shadow: 0 0 20px #ef5350; }
   }
-  .windBtn.active.green {
-    animation: pulseGreen 1.6s infinite ease-in-out;
+  .active-favor {
+    animation: pulse-green 1.5s infinite;
   }
-  .windBtn.active.red {
-    animation: pulseRed 1.6s infinite ease-in-out;
+  .active-contra {
+    animation: pulse-red 1.5s infinite;
   }
-
-  /* Organiza botões para caber 27 elementos sem scroll em 1 coluna com espaçamento confortável */
-
-  /* Calculando altura disponível: 95vh, queremos 27 botões + 26 gaps.
-     Usamos grid para facilitar, 27 linhas com gap 6px -> 26*6=156px gaps
-     Altura total de botões = 95vh - 156px
-     Então altura botão será (95vh - 156px)/27 ~ 24px botão + linha de gap */
-
-  #windsLeft, #windsRight {
-    grid-template-rows: repeat(27, minmax(24px, 1fr));
-    row-gap: 6px;
-  }
-  .windBtn {
-    height: 24px;
-    line-height: 24px;
-    font-size: 0.9rem;
-    width: 40px;
-  }
-
 </style>
 </head>
 <body>
 
-  <div id="angleDisplay">--°</div>
+<header>
+  Ângulo: <span id="angleResult" class="angle-display">--</span>°
+</header>
 
-  <div id="windsLeft" aria-label="Vento Contra (Vermelho)"></div>
-  <div id="windsRight" aria-label="Vento A Favor (Verde)"></div>
+<div class="ruler-container" id="ruler">
+  <!-- 20 segmentos da régua serão criados via JS -->
+  <div id="rulerFill" class="ruler-fill" style="width:0;"></div>
+</div>
 
-  <div id="rulerContainer" aria-label="Régua de distância">
-    <div id="rulerProgress"></div>
-  </div>
+<div class="wind-container">
+  <div class="wind-side left" id="windContra"></div>
+  <div class="wind-side right" id="windFavor"></div>
+</div>
 
-<script>
-  const rulerContainer = document.getElementById('rulerContainer');
-  const rulerProgress = document.getElementById('rulerProgress');
-  const angleDisplay = document.getElementById('angleDisplay');
-  const windsLeft = document.getElementById('windsLeft');
-  const windsRight = document.getElementById('windsRight');
+<script type="module">
+import { calcularAngulo } from './calculoAngulo.js';
 
-  const rulerWidth = 800;
-  const segmentsCount = 20;
+const ruler = document.getElementById('ruler');
+const angleResult = document.getElementById('angleResult');
+const windContra = document.getElementById('windContra');
+const windFavor = document.getElementById('windFavor');
+const rulerFill = document.getElementById('rulerFill');
 
-  let mouseXOnRuler = null; // null significa nada selecionado
-  let selectedWind = null;  // 0..26 ou null
-  let selectedWindSide = null; // 'favor' | 'contra' | null
+const RULER_WIDTH = 800;
+const SEGMENTS = 20;
 
-  // Criar segmentos visuais da régua
-  function createRulerSegments() {
-    for(let i=0; i<segmentsCount; i++) {
-      const seg = document.createElement('div');
-      seg.classList.add('rulerSegment');
-      rulerContainer.appendChild(seg);
-    }
+let selectedDistance = null; // em px
+let selectedWind = null; // objeto { valor: 0-26, lado: 'favor' | 'contra' }
+
+function criarRulerSegments() {
+  for(let i=0; i<SEGMENTS; i++) {
+    const seg = document.createElement('div');
+    seg.classList.add('ruler-segment');
+    seg.dataset.index = i;
+    ruler.appendChild(seg);
   }
+}
 
-  // Criar botões vento
-  function createWindButtons() {
-    for(let i=0; i<=26; i++) {
-      // Contra (vermelho)
-      const btnContra = document.createElement('div');
-      btnContra.classList.add('windBtn', 'red');
-      btnContra.textContent = i;
-      btnContra.dataset.wind = i;
-      btnContra.dataset.side = 'contra';
-      windsLeft.appendChild(btnContra);
+function iluminarRuler(atPx) {
+  const percent = Math.min(Math.max(atPx / RULER_WIDTH, 0), 1);
+  rulerFill.style.width = (percent * 100) + '%';
 
-      // Favor (verde)
-      const btnFavor = document.createElement('div');
-      btnFavor.classList.add('windBtn', 'green');
-      btnFavor.textContent = i;
-      btnFavor.dataset.wind = i;
-      btnFavor.dataset.side = 'favor';
-      windsRight.appendChild(btnFavor);
-    }
-  }
-
-  // Atualiza barra progressiva da régua
-  function updateRulerProgress(px) {
-    if(px < 0) px = 0;
-    if(px > rulerWidth) px = rulerWidth;
-    rulerProgress.style.width = px + 'px';
-  }
-
-  // Cálculo do ângulo conforme a regra dada
-  function calculateAngle(distancePx, windValue, windSide) {
-    if(distancePx === null || windValue === null || windSide === null) return null;
-
-    // distância em graus de 0 a 90
-    const maxAngleFromDistance = 90;
-    const distanceAngle = (distancePx / rulerWidth) * maxAngleFromDistance;
-
-    const bars = 2;
-    const windAngleEffect = windValue * 5 * bars;
-
-    let angle;
-    if(windSide === 'favor') {
-      angle = 90 - distanceAngle + windAngleEffect;
+  // ativar os segmentos até o hover
+  const segments = [...ruler.querySelectorAll('.ruler-segment')];
+  segments.forEach((seg, i) => {
+    const segStart = (i * RULER_WIDTH) / SEGMENTS;
+    if (segStart <= atPx) {
+      seg.classList.add('illuminated');
     } else {
-      angle = 90 - distanceAngle - windAngleEffect;
+      seg.classList.remove('illuminated');
     }
-
-    // Truncar para inteiro, dois dígitos, sem arredondar
-    angle = Math.floor(angle);
-    if(angle < 0) angle = 0; // Evita negativo (opcional)
-    if(angle > 99) angle = 99; // Limita a dois dígitos
-    return angle;
-  }
-
-  // Atualiza texto do ângulo
-  function updateAngleDisplay() {
-    const angle = calculateAngle(mouseXOnRuler, selectedWind, selectedWindSide);
-    angleDisplay.textContent = angle !== null ? `${angle}°` : '--°';
-  }
-
-  // Persistência seleção régua
-  rulerContainer.addEventListener('mousemove', e => {
-    const rect = rulerContainer.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    if(x < 0) x = 0;
-    if(x > rulerWidth) x = rulerWidth;
-
-    mouseXOnRuler = x;
-    updateRulerProgress(x);
-    updateAngleDisplay();
   });
+}
 
-  // Só limpa se o mouse sair da régua e sem nova seleção feita
-  rulerContainer.addEventListener('mouseleave', e => {
-    // NÃO limpar mouseXOnRuler para persistência
+function atualizarAngulo() {
+  if (selectedDistance === null || selectedWind === null) {
+    angleResult.textContent = '--';
+    return;
+  }
+  const ang = calcularAngulo(selectedDistance, selectedWind.valor, selectedWind.lado);
+  if (ang === null) {
+    angleResult.textContent = '--';
+  } else {
+    angleResult.textContent = ang.toString().padStart(2,'0');
+  }
+}
+
+// Eventos régua
+ruler.addEventListener('mousemove', (e) => {
+  const rect = ruler.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  iluminarRuler(x);
+  selectedDistance = Math.min(Math.max(x, 0), RULER_WIDTH);
+  atualizarAngulo();
+});
+
+ruler.addEventListener('mouseleave', () => {
+  rulerFill.style.width = '0';
+  selectedDistance = null;
+  atualizarAngulo();
+});
+
+// Criar botões vento
+function criarBotoesVento() {
+  for(let v=0; v<=26; v++) {
+    // Contra vento (esquerda)
+    const btnContra = document.createElement('button');
+    btnContra.textContent = v;
+    btnContra.className = 'wind-button wind-contra';
+    btnContra.addEventListener('click', () => {
+      selectedWind = { valor: v, lado: 'contra' };
+      atualizarAngulo();
+      destacarBotao(selectedWind);
+    });
+    windContra.appendChild(btnContra);
+
+    // Favor vento (direita)
+    const btnFavor = document.createElement('button');
+    btnFavor.textContent = v;
+    btnFavor.className = 'wind-button wind-favor';
+    btnFavor.addEventListener('click', () => {
+      selectedWind = { valor: v, lado: 'favor' };
+      atualizarAngulo();
+      destacarBotao(selectedWind);
+    });
+    windFavor.appendChild(btnFavor);
+  }
+}
+
+function destacarBotao(wind) {
+  // Remove classes active
+  document.querySelectorAll('.wind-button').forEach(b => {
+    b.classList.remove('active-favor', 'active-contra');
   });
+  if (!wind) return;
 
-  // Evento hover botões vento
-  function onWindHover(e) {
-    if(!e.target.classList.contains('windBtn')) return;
-    const side = e.target.dataset.side;
-    const wind = Number(e.target.dataset.wind);
-
-    // Se já ativo no lado diferente, remover anterior desse lado
-    let parent = side === 'favor' ? windsRight : windsLeft;
-    [...parent.children].forEach(btn => btn.classList.remove('active'));
-
-    e.target.classList.add('active');
-
-    // Atualiza seleção só do lado alterado
-    if(selectedWindSide !== side) {
-      // Remove seleção do outro lado, se havia
-      if(selectedWindSide === 'favor') {
-        [...windsRight.children].forEach(btn => btn.classList.remove('active'));
-      } else if(selectedWindSide === 'contra') {
-        [...windsLeft.children].forEach(btn => btn.classList.remove('active'));
-      }
+  const container = wind.lado === 'favor' ? windFavor : windContra;
+  for(const btn of container.children) {
+    if (btn.textContent == wind.valor) {
+      btn.classList.add(wind.lado === 'favor' ? 'active-favor' : 'active-contra');
     }
-    selectedWindSide = side;
-    selectedWind = wind;
-    updateAngleDisplay();
   }
+}
 
-  // Colocar eventos em container (delegation)
-  windsLeft.addEventListener('mousemove', onWindHover);
-  windsRight.addEventListener('mousemove', onWindHover);
-
-  // Inicializa tudo
-  createRulerSegments();
-  createWindButtons();
-
-  // Persistência da seleção inicial com valores nulos
-  updateAngleDisplay();
+criarRulerSegments();
+criarBotoesVento();
 
 </script>
+
 </body>
 </html>
