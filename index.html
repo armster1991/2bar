@@ -3,25 +3,50 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calculadora de Ângulo Precisa - 2 Bars</title>
+<title>Calculadora de Ângulo Precisa</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
-  /* Reset básico */
+  /* Reset */
   * {
     box-sizing: border-box;
     margin: 0; padding: 0;
   }
   html, body {
     height: 100vh;
-    background: #0a0a0a;
     font-family: 'Orbitron', sans-serif;
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow-x: hidden;
+    color: white;
+    overflow: hidden;
     user-select: none;
+    background: #101820;
+    background-image:
+      radial-gradient(circle at left center, rgba(255,0,0,0.15) 0%, transparent 70%),
+      radial-gradient(circle at right center, rgba(0,255,0,0.15) 0%, transparent 70%);
+  }
+
+  /* Animação "fios elétricos" sutil */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,0,0,0.07) 0, rgba(255,0,0,0.07) 2px,
+        transparent 3px, transparent 8px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0,255,0,0.07) 0, rgba(0,255,0,0.07) 2px,
+        transparent 3px, transparent 8px
+      );
+    animation: flowElectric 10s linear infinite;
+    z-index: 0;
+  }
+  @keyframes flowElectric {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 200px 0, -200px 0; }
   }
 
   /* --- Ângulo no topo --- */
@@ -29,11 +54,11 @@
     text-align: center;
     font-size: 5rem;
     padding: 1.2rem 0;
-    color: #ffa500;
+    z-index: 10;
+    color: white;
     text-shadow:
-      0 0 8px #ffa500,
-      0 0 20px #ffae1a,
-      0 0 30px #ffb84d;
+      0 0 6px #0ff,
+      0 0 15px #0ffccf;
   }
 
   /* --- Régua inferior --- */
@@ -44,20 +69,21 @@
     transform: translateX(-50%);
     width: 800px;
     height: 40px;
-    background: #111;
+    background: linear-gradient(90deg, #004466, #0077aa);
     border-radius: 8px;
     box-shadow:
-      0 0 12px #ff7f00,
-      inset 0 0 30px #ff7f00;
+      0 0 8px #00caffaa inset;
     cursor: crosshair;
     display: flex;
     overflow: hidden;
+    user-select: none;
+    z-index: 10;
   }
 
   /* Segmentos da régua: 20 divisões visuais */
   .rulerSegment {
     flex: 1;
-    border-right: 1px solid #333;
+    border-right: 1px solid rgba(255 255 255 / 0.12);
     position: relative;
   }
   .rulerSegment:last-child {
@@ -66,28 +92,27 @@
   .rulerSegment::after {
     content: '';
     position: absolute;
-    top: 2px;
+    top: 6px;
     right: 0;
-    height: 36px;
+    height: 28px;
     width: 1px;
-    background: #333;
+    background: rgba(255 255 255 / 0.12);
   }
 
-  /* Sobreposição laranja neon progressiva */
+  /* Sobreposição progressiva */
   #rulerProgress {
     position: absolute;
     top: 0;
     left: 0;
     height: 40px;
     width: 0;
-    background: #ff7f00;
+    background: linear-gradient(90deg, #00d2ff, #006fbb);
     box-shadow:
-      0 0 10px #ff7f00,
-      inset 0 0 20px #ff7f00;
+      0 0 12px #00d2ff,
+      inset 0 0 12px #00aaff;
     border-radius: 8px 0 0 8px;
     pointer-events: none;
     transition: width 0.05s linear;
-    mix-blend-mode: screen;
   }
 
   /* --- Botões vento --- */
@@ -95,74 +120,77 @@
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 4px;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+    max-height: 95vh;
+    padding: 6px 4px;
+    z-index: 10;
     user-select: none;
   }
   #windsLeft {
-    left: 10px;
+    left: 8px;
   }
   #windsRight {
-    right: 10px;
+    right: 8px;
   }
 
   .windBtn {
-    width: 44px;
+    width: 40px;
     height: 28px;
     line-height: 28px;
-    text-align: center;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     border-radius: 6px;
-    box-shadow: 0 0 6px #222;
+    box-shadow:
+      inset 0 0 6px rgba(0,0,0,0.7);
     cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    color: #ddd;
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease,
+      color 0.3s ease;
+    color: white;
+    text-align: center;
+    background: linear-gradient(135deg, #003300, #006600);
     user-select: none;
   }
-  .windBtn.green {
-    background-color: #013300;
-    box-shadow: 0 0 8px #00ff00;
-  }
   .windBtn.red {
-    background-color: #330000;
-    box-shadow: 0 0 8px #ff0000;
+    background: linear-gradient(135deg, #660000, #990000);
+  }
+  .windBtn.green {
+    background: linear-gradient(135deg, #004400, #00aa00);
   }
 
   /* Pulsar animação */
   @keyframes pulseGreen {
     0%, 100% {
       box-shadow:
-        0 0 8px #00ff00,
-        0 0 20px #00ff00;
-      background-color: #014400;
-      color: #bfffbf;
+        0 0 8px #00ff00aa,
+        inset 0 0 10px #00ff00aa;
+      background-color: #007700;
+      color: #ccffcc;
     }
     50% {
       box-shadow:
-        0 0 20px #7fff7f,
-        0 0 40px #7fff7f;
-      background-color: #007700;
-      color: #dfffdf;
+        0 0 18px #00ff00ee,
+        inset 0 0 24px #00ff00ee;
+      background-color: #00bb00;
+      color: #ddffdd;
     }
   }
   @keyframes pulseRed {
     0%, 100% {
       box-shadow:
-        0 0 8px #ff0000,
-        0 0 20px #ff0000;
-      background-color: #440000;
+        0 0 8px #ff0000aa,
+        inset 0 0 10px #ff0000aa;
+      background-color: #770000;
       color: #ffbbbb;
     }
     50% {
       box-shadow:
-        0 0 20px #ff7f7f,
-        0 0 40px #ff7f7f;
-      background-color: #770000;
+        0 0 18px #ff0000ee,
+        inset 0 0 24px #ff0000ee;
+      background-color: #cc0000;
       color: #ffdddd;
     }
   }
@@ -173,24 +201,22 @@
     animation: pulseRed 1.6s infinite ease-in-out;
   }
 
-  /* Scrollbar mais discreto */
-  #windsLeft::-webkit-scrollbar,
-  #windsRight::-webkit-scrollbar {
-    width: 6px;
-  }
-  #windsLeft::-webkit-scrollbar-thumb,
-  #windsRight::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 3px;
-  }
-  #windsLeft::-webkit-scrollbar-track,
-  #windsRight::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* Organiza botões para caber 27 elementos sem scroll em 1 coluna com espaçamento confortável */
 
-  /* Pequeno ajuste para a régua ter posição relativa para o progresso */
-  #rulerContainer {
-    position: fixed;
+  /* Calculando altura disponível: 95vh, queremos 27 botões + 26 gaps.
+     Usamos grid para facilitar, 27 linhas com gap 6px -> 26*6=156px gaps
+     Altura total de botões = 95vh - 156px
+     Então altura botão será (95vh - 156px)/27 ~ 24px botão + linha de gap */
+
+  #windsLeft, #windsRight {
+    grid-template-rows: repeat(27, minmax(24px, 1fr));
+    row-gap: 6px;
+  }
+  .windBtn {
+    height: 24px;
+    line-height: 24px;
+    font-size: 0.9rem;
+    width: 40px;
   }
 
 </style>
@@ -213,26 +239,26 @@
   const windsLeft = document.getElementById('windsLeft');
   const windsRight = document.getElementById('windsRight');
 
-  const rulerWidth = 800; // px
+  const rulerWidth = 800;
   const segmentsCount = 20;
 
-  let mouseXOnRuler = 0;
-  let selectedWind = 0;
-  let selectedWindSide = 'favor'; // 'favor' ou 'contra'
+  let mouseXOnRuler = null; // null significa nada selecionado
+  let selectedWind = null;  // 0..26 ou null
+  let selectedWindSide = null; // 'favor' | 'contra' | null
 
-  // Cria divisões visuais da régua
+  // Criar segmentos visuais da régua
   function createRulerSegments() {
-    for(let i = 0; i < segmentsCount; i++) {
+    for(let i=0; i<segmentsCount; i++) {
       const seg = document.createElement('div');
       seg.classList.add('rulerSegment');
       rulerContainer.appendChild(seg);
     }
   }
 
-  // Cria botões de vento (0 a 26) para cada lado
+  // Criar botões vento
   function createWindButtons() {
-    for(let i = 0; i <= 26; i++) {
-      // Vento contra (vermelho)
+    for(let i=0; i<=26; i++) {
+      // Contra (vermelho)
       const btnContra = document.createElement('div');
       btnContra.classList.add('windBtn', 'red');
       btnContra.textContent = i;
@@ -240,7 +266,7 @@
       btnContra.dataset.side = 'contra';
       windsLeft.appendChild(btnContra);
 
-      // Vento a favor (verde)
+      // Favor (verde)
       const btnFavor = document.createElement('div');
       btnFavor.classList.add('windBtn', 'green');
       btnFavor.textContent = i;
@@ -250,47 +276,46 @@
     }
   }
 
-  // Atualiza a barra laranja progressiva da régua
+  // Atualiza barra progressiva da régua
   function updateRulerProgress(px) {
-    // Garantir limites
     if(px < 0) px = 0;
     if(px > rulerWidth) px = rulerWidth;
-
     rulerProgress.style.width = px + 'px';
   }
 
-  // Calcula ângulo preciso
-  function calculateAngle(mouseX, wind, side) {
-    // mouseX: 0-800 px
-    // 1 bar = 5 graus, 2 bars = 10 graus fixo
-    // distância em graus = (mouseX / 800) * 90 (vamos assumir que 800px representa 90° para máxima precisão)
-    // fórmula: angle = 90 - distanceAngle ± wind * 5 * 2 (sempre 2 bars = 10° por bar, vento multiplicado pelo número)
+  // Cálculo do ângulo conforme a regra dada
+  function calculateAngle(distancePx, windValue, windSide) {
+    if(distancePx === null || windValue === null || windSide === null) return null;
 
-    const maxAngleFromDistance = 90; // máximo 90°
-    const distanceAngle = (mouseX / rulerWidth) * maxAngleFromDistance; // 0 a 90
+    // distância em graus de 0 a 90
+    const maxAngleFromDistance = 90;
+    const distanceAngle = (distancePx / rulerWidth) * maxAngleFromDistance;
 
     const bars = 2;
-    const windAngleEffect = wind * 5 * bars; // ex: vento 10 => 10*5*2 = 100°, multiplicador fixo
+    const windAngleEffect = windValue * 5 * bars;
 
     let angle;
-    if(side === 'favor') {
+    if(windSide === 'favor') {
       angle = 90 - distanceAngle + windAngleEffect;
     } else {
       angle = 90 - distanceAngle - windAngleEffect;
     }
 
-    // Deixar ângulo sem limite para maior controle do usuário
-    return angle.toFixed(2);
+    // Truncar para inteiro, dois dígitos, sem arredondar
+    angle = Math.floor(angle);
+    if(angle < 0) angle = 0; // Evita negativo (opcional)
+    if(angle > 99) angle = 99; // Limita a dois dígitos
+    return angle;
   }
 
-  // Atualiza display do ângulo
+  // Atualiza texto do ângulo
   function updateAngleDisplay() {
     const angle = calculateAngle(mouseXOnRuler, selectedWind, selectedWindSide);
-    angleDisplay.textContent = `${angle}°`;
+    angleDisplay.textContent = angle !== null ? `${angle}°` : '--°';
   }
 
-  // Eventos régua
-  rulerContainer.addEventListener('mousemove', (e) => {
+  // Persistência seleção régua
+  rulerContainer.addEventListener('mousemove', e => {
     const rect = rulerContainer.getBoundingClientRect();
     let x = e.clientX - rect.left;
     if(x < 0) x = 0;
@@ -301,53 +326,48 @@
     updateAngleDisplay();
   });
 
-  rulerContainer.addEventListener('mouseleave', () => {
-    mouseXOnRuler = 0;
-    updateRulerProgress(0);
-    updateAngleDisplay();
+  // Só limpa se o mouse sair da régua e sem nova seleção feita
+  rulerContainer.addEventListener('mouseleave', e => {
+    // NÃO limpar mouseXOnRuler para persistência
   });
 
-  // Eventos botões vento (hover)
+  // Evento hover botões vento
   function onWindHover(e) {
-    if(e.target.classList.contains('windBtn')) {
-      const side = e.target.dataset.side;
-      const parent = side === 'favor' ? windsRight : windsLeft;
+    if(!e.target.classList.contains('windBtn')) return;
+    const side = e.target.dataset.side;
+    const wind = Number(e.target.dataset.wind);
 
-      // Remove active em todos do lado
-      [...parent.children].forEach(btn => btn.classList.remove('active'));
+    // Se já ativo no lado diferente, remover anterior desse lado
+    let parent = side === 'favor' ? windsRight : windsLeft;
+    [...parent.children].forEach(btn => btn.classList.remove('active'));
 
-      // Marca ativo o atual
-      e.target.classList.add('active');
+    e.target.classList.add('active');
 
-      selectedWind = Number(e.target.dataset.wind);
-      selectedWindSide = side;
-      updateAngleDisplay();
+    // Atualiza seleção só do lado alterado
+    if(selectedWindSide !== side) {
+      // Remove seleção do outro lado, se havia
+      if(selectedWindSide === 'favor') {
+        [...windsRight.children].forEach(btn => btn.classList.remove('active'));
+      } else if(selectedWindSide === 'contra') {
+        [...windsLeft.children].forEach(btn => btn.classList.remove('active'));
+      }
     }
+    selectedWindSide = side;
+    selectedWind = wind;
+    updateAngleDisplay();
   }
 
+  // Colocar eventos em container (delegation)
   windsLeft.addEventListener('mousemove', onWindHover);
   windsRight.addEventListener('mousemove', onWindHover);
 
-  windsLeft.addEventListener('mouseleave', () => {
-    [...windsLeft.children].forEach(btn => btn.classList.remove('active'));
-    selectedWind = 0;
-    selectedWindSide = 'favor'; // default
-    updateAngleDisplay();
-  });
-  windsRight.addEventListener('mouseleave', () => {
-    [...windsRight.children].forEach(btn => btn.classList.remove('active'));
-    selectedWind = 0;
-    selectedWindSide = 'favor'; // default
-    updateAngleDisplay();
-  });
-
-  // Inicializar
+  // Inicializa tudo
   createRulerSegments();
   createWindButtons();
-  updateRulerProgress(0);
+
+  // Persistência da seleção inicial com valores nulos
   updateAngleDisplay();
 
 </script>
-
 </body>
 </html>
