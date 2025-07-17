@@ -6,158 +6,122 @@
 <title>Calculadora de Ângulo 2 Barras - Gunbound</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
   body {
-    margin: 0;
+    margin: 0; padding: 0;
     height: 100vh;
+    background: linear-gradient(90deg, #15202b, #0f1419);
+    font-family: 'Share Tech Mono', monospace;
+    color: #fff;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(90deg, #2b2f4a 0%, #1c2137 100%);
-    font-family: 'Share Tech Mono', monospace;
-    color: white;
-    overflow: hidden;
-    position: relative;
-  }
-
-  header {
-    text-align: center;
-    margin: 1rem auto 2rem;
-    font-size: 3rem;
-    letter-spacing: 2px;
+    align-items: center;
     user-select: none;
   }
-
-  .angle-display {
-    font-weight: bold;
+  header {
+    margin: 2rem 0 1rem 0;
+    font-size: 2.5rem;
     color: #a2d5f2;
-    text-shadow: 0 0 5px #4a90e2;
+    text-shadow: 0 0 8px #3a7bd5;
   }
-
-  /* Régua */
-  .ruler-container {
+  #angleResult {
+    font-weight: 700;
+  }
+  #ruler {
     position: fixed;
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     width: 800px;
     height: 40px;
-    background: linear-gradient(90deg, #3a4a68 0%, #2c3a59 100%);
-    border-radius: 10px;
-    box-shadow: 0 0 10px #3a4a68;
+    background: linear-gradient(90deg, #23344d, #1a2a43);
+    border-radius: 8px;
+    box-shadow: 0 0 12px #2f4f7c;
     display: flex;
-    user-select: none;
+    cursor: pointer;
   }
-
   .ruler-segment {
     flex: 1;
-    border-right: 1px solid #556a8a;
-    position: relative;
-    cursor: pointer;
+    border-right: 1px solid #3f5a8a;
   }
   .ruler-segment:last-child {
     border-right: none;
   }
-
-  .ruler-segment:hover,
-  .ruler-segment.active {
+  .ruler-segment.active,
+  .ruler-segment:hover {
     background: #4db6ac;
-    box-shadow: 0 0 10px #26a69a;
+    box-shadow: 0 0 8px #26a69a;
   }
-
-  .ruler-segment.illuminated {
-    background: #4db6ac;
-  }
-
-  /* Barra iluminada da régua até o mouse */
   .ruler-fill {
     position: absolute;
+    top: 0; left: 0;
     height: 100%;
-    top: 0;
-    left: 0;
-    background: linear-gradient(90deg, #26a69a 0%, #4db6ac 100%);
+    background: linear-gradient(90deg, #26a69a, #4db6ac);
+    border-radius: 8px 0 0 8px;
     pointer-events: none;
-    border-radius: 10px 0 0 10px;
+    transition: width 0.1s ease;
     z-index: 1;
-    transition: width 0.1s ease-out;
   }
-
-  /* Container dos botões vento */
   .wind-container {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    height: 70vh;
+    gap: 40px;
     user-select: none;
-    font-weight: bold;
-    font-size: 1rem;
+    pointer-events: auto;
   }
-
   .wind-side {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 6px;
-    height: 100%;
+    gap: 8px;
+    max-height: 80vh;
+    overflow-y: auto;
   }
-
   .wind-side.left {
-    left: 10px;
+    align-items: flex-start;
   }
-
   .wind-side.right {
-    right: 10px;
+    align-items: flex-end;
   }
-
   .wind-button {
-    padding: 6px 12px;
+    min-width: 36px;
+    padding: 6px 8px;
     border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    color: white;
     cursor: pointer;
     transition: box-shadow 0.3s ease;
-    text-align: center;
-    color: white;
     user-select: none;
   }
-
-  /* Cores vento a favor (verde) e contra (vermelho) */
   .wind-favor {
     background: linear-gradient(135deg, #00796b, #004d40);
   }
   .wind-contra {
     background: linear-gradient(135deg, #b71c1c, #7f0000);
   }
-
-  /* Pulsar animado quando ativo */
-  @keyframes pulse-green {
-    0%, 100% { box-shadow: 0 0 8px #26a69a; }
-    50% { box-shadow: 0 0 20px #4db6ac; }
+  .wind-button.active-favor {
+    box-shadow: 0 0 12px #26a69a;
   }
-  @keyframes pulse-red {
-    0%, 100% { box-shadow: 0 0 8px #e53935; }
-    50% { box-shadow: 0 0 20px #ef5350; }
-  }
-  .active-favor {
-    animation: pulse-green 1.5s infinite;
-  }
-  .active-contra {
-    animation: pulse-red 1.5s infinite;
+  .wind-button.active-contra {
+    box-shadow: 0 0 12px #ef5350;
   }
 </style>
 </head>
 <body>
 
 <header>
-  Ângulo: <span id="angleResult" class="angle-display">--</span>°
+  Ângulo: <span id="angleResult">--</span>°
 </header>
 
-<div class="ruler-container" id="ruler">
-  <!-- 20 segmentos da régua serão criados via JS -->
-  <div id="rulerFill" class="ruler-fill" style="width:0;"></div>
+<div id="ruler">
+  <div id="rulerFill" class="ruler-fill" style="width: 0;"></div>
 </div>
 
 <div class="wind-container">
-  <div class="wind-side left" id="windContra"></div>
-  <div class="wind-side right" id="windFavor"></div>
+  <div id="windContra" class="wind-side left"></div>
+  <div id="windFavor" class="wind-side right"></div>
 </div>
 
 <script type="module">
@@ -172,8 +136,8 @@ const rulerFill = document.getElementById('rulerFill');
 const RULER_WIDTH = 800;
 const SEGMENTS = 20;
 
-let selectedDistance = null; // em px
-let selectedWind = null; // objeto { valor: 0-26, lado: 'favor' | 'contra' }
+let selectedDistance = null; // px
+let selectedWind = null; // { valor: number, lado: 'favor'|'contra' }
 
 function criarRulerSegments() {
   for(let i=0; i<SEGMENTS; i++) {
@@ -183,20 +147,15 @@ function criarRulerSegments() {
     ruler.appendChild(seg);
   }
 }
-
-function iluminarRuler(atPx) {
-  const percent = Math.min(Math.max(atPx / RULER_WIDTH, 0), 1);
+function iluminarRuler(px) {
+  let percent = Math.min(Math.max(px / RULER_WIDTH, 0), 1);
   rulerFill.style.width = (percent * 100) + '%';
 
-  // ativar os segmentos até o hover
-  const segments = [...ruler.querySelectorAll('.ruler-segment')];
-  segments.forEach((seg, i) => {
+  const segmentos = [...ruler.querySelectorAll('.ruler-segment')];
+  segmentos.forEach((seg, i) => {
     const segStart = (i * RULER_WIDTH) / SEGMENTS;
-    if (segStart <= atPx) {
-      seg.classList.add('illuminated');
-    } else {
-      seg.classList.remove('illuminated');
-    }
+    if (segStart <= px) seg.classList.add('active');
+    else seg.classList.remove('active');
   });
 }
 
@@ -206,15 +165,12 @@ function atualizarAngulo() {
     return;
   }
   const ang = calcularAngulo(selectedDistance, selectedWind.valor, selectedWind.lado);
-  if (ang === null) {
-    angleResult.textContent = '--';
-  } else {
-    angleResult.textContent = ang.toString().padStart(2,'0');
-  }
+  if (ang === null) angleResult.textContent = '--';
+  else angleResult.textContent = ang.toString().padStart(2, '0');
 }
 
-// Eventos régua
-ruler.addEventListener('mousemove', (e) => {
+// Evento mouse sobre régua
+ruler.addEventListener('mousemove', e => {
   const rect = ruler.getBoundingClientRect();
   const x = e.clientX - rect.left;
   iluminarRuler(x);
@@ -231,7 +187,7 @@ ruler.addEventListener('mouseleave', () => {
 // Criar botões vento
 function criarBotoesVento() {
   for(let v=0; v<=26; v++) {
-    // Contra vento (esquerda)
+    // vento contra (esquerda)
     const btnContra = document.createElement('button');
     btnContra.textContent = v;
     btnContra.className = 'wind-button wind-contra';
@@ -242,7 +198,7 @@ function criarBotoesVento() {
     });
     windContra.appendChild(btnContra);
 
-    // Favor vento (direita)
+    // vento a favor (direita)
     const btnFavor = document.createElement('button');
     btnFavor.textContent = v;
     btnFavor.className = 'wind-button wind-favor';
@@ -256,7 +212,6 @@ function criarBotoesVento() {
 }
 
 function destacarBotao(wind) {
-  // Remove classes active
   document.querySelectorAll('.wind-button').forEach(b => {
     b.classList.remove('active-favor', 'active-contra');
   });
@@ -266,6 +221,7 @@ function destacarBotao(wind) {
   for(const btn of container.children) {
     if (btn.textContent == wind.valor) {
       btn.classList.add(wind.lado === 'favor' ? 'active-favor' : 'active-contra');
+      break;
     }
   }
 }
@@ -274,6 +230,5 @@ criarRulerSegments();
 criarBotoesVento();
 
 </script>
-
 </body>
 </html>
