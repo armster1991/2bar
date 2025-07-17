@@ -1,234 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calculadora de Ângulo 2 Barras - Gunbound</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-  body {
-    margin: 0; padding: 0;
-    height: 100vh;
-    background: linear-gradient(90deg, #15202b, #0f1419);
-    font-family: 'Share Tech Mono', monospace;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
-  }
-  header {
-    margin: 2rem 0 1rem 0;
-    font-size: 2.5rem;
-    color: #a2d5f2;
-    text-shadow: 0 0 8px #3a7bd5;
-  }
-  #angleResult {
-    font-weight: 700;
-  }
-  #ruler {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    height: 40px;
-    background: linear-gradient(90deg, #23344d, #1a2a43);
-    border-radius: 8px;
-    box-shadow: 0 0 12px #2f4f7c;
-    display: flex;
-    cursor: pointer;
-  }
-  .ruler-segment {
-    flex: 1;
-    border-right: 1px solid #3f5a8a;
-  }
-  .ruler-segment:last-child {
-    border-right: none;
-  }
-  .ruler-segment.active,
-  .ruler-segment:hover {
-    background: #4db6ac;
-    box-shadow: 0 0 8px #26a69a;
-  }
-  .ruler-fill {
-    position: absolute;
-    top: 0; left: 0;
-    height: 100%;
-    background: linear-gradient(90deg, #26a69a, #4db6ac);
-    border-radius: 8px 0 0 8px;
-    pointer-events: none;
-    transition: width 0.1s ease;
-    z-index: 1;
-  }
-  .wind-container {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 40px;
-    user-select: none;
-    pointer-events: auto;
-  }
-  .wind-side {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  .wind-side.left {
-    align-items: flex-start;
-  }
-  .wind-side.right {
-    align-items: flex-end;
-  }
-  .wind-button {
-    min-width: 36px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease;
-    user-select: none;
-  }
-  .wind-favor {
-    background: linear-gradient(135deg, #00796b, #004d40);
-  }
-  .wind-contra {
-    background: linear-gradient(135deg, #b71c1c, #7f0000);
-  }
-  .wind-button.active-favor {
-    box-shadow: 0 0 12px #26a69a;
-  }
-  .wind-button.active-contra {
-    box-shadow: 0 0 12px #ef5350;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Ângulo - 2 Barras</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div id="alerta-mobile">⚠️ Selecione seu Mobile ⚠️</div>
 
-<header>
-  Ângulo: <span id="angleResult">--</span>°
-</header>
+  <div id="resultado-container">
+    <span id="angulo-resultado">--</span>
+  </div>
 
-<div id="ruler">
-  <div id="rulerFill" class="ruler-fill" style="width: 0;"></div>
-</div>
+  <div id="menu-mobile">
+    <label for="mobile-select">Escolha o Mobile:</label>
+    <select id="mobile-select">
+      <option value="">--</option>
+      <option value="armor">Armor</option>
+      <option value="asate">A.Sate</option>
+      <option value="mage">Mage</option>
+      <option value="raon">Raon</option>
+    </select>
+  </div>
 
-<div class="wind-container">
-  <div id="windContra" class="wind-side left"></div>
-  <div id="windFavor" class="wind-side right"></div>
-</div>
+  <div id="ventos-container">
+    <div id="ventos-contra" class="vento-coluna"></div>
+    <div id="ventos-favor" class="vento-coluna"></div>
+  </div>
 
-<script type="module">
-import { calcularAngulo } from './calculoAngulo.js';
+  <div id="regua-container">
+    <div id="regua"></div>
+  </div>
 
-const ruler = document.getElementById('ruler');
-const angleResult = document.getElementById('angleResult');
-const windContra = document.getElementById('windContra');
-const windFavor = document.getElementById('windFavor');
-const rulerFill = document.getElementById('rulerFill');
-
-const RULER_WIDTH = 800;
-const SEGMENTS = 20;
-
-let selectedDistance = null; // px
-let selectedWind = null; // { valor: number, lado: 'favor'|'contra' }
-
-function criarRulerSegments() {
-  for(let i=0; i<SEGMENTS; i++) {
-    const seg = document.createElement('div');
-    seg.classList.add('ruler-segment');
-    seg.dataset.index = i;
-    ruler.appendChild(seg);
-  }
-}
-function iluminarRuler(px) {
-  let percent = Math.min(Math.max(px / RULER_WIDTH, 0), 1);
-  rulerFill.style.width = (percent * 100) + '%';
-
-  const segmentos = [...ruler.querySelectorAll('.ruler-segment')];
-  segmentos.forEach((seg, i) => {
-    const segStart = (i * RULER_WIDTH) / SEGMENTS;
-    if (segStart <= px) seg.classList.add('active');
-    else seg.classList.remove('active');
-  });
-}
-
-function atualizarAngulo() {
-  if (selectedDistance === null || selectedWind === null) {
-    angleResult.textContent = '--';
-    return;
-  }
-  const ang = calcularAngulo(selectedDistance, selectedWind.valor, selectedWind.lado);
-  if (ang === null) angleResult.textContent = '--';
-  else angleResult.textContent = ang.toString().padStart(2, '0');
-}
-
-// Evento mouse sobre régua
-ruler.addEventListener('mousemove', e => {
-  const rect = ruler.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  iluminarRuler(x);
-  selectedDistance = Math.min(Math.max(x, 0), RULER_WIDTH);
-  atualizarAngulo();
-});
-
-ruler.addEventListener('mouseleave', () => {
-  rulerFill.style.width = '0';
-  selectedDistance = null;
-  atualizarAngulo();
-});
-
-// Criar botões vento
-function criarBotoesVento() {
-  for(let v=0; v<=26; v++) {
-    // vento contra (esquerda)
-    const btnContra = document.createElement('button');
-    btnContra.textContent = v;
-    btnContra.className = 'wind-button wind-contra';
-    btnContra.addEventListener('click', () => {
-      selectedWind = { valor: v, lado: 'contra' };
-      atualizarAngulo();
-      destacarBotao(selectedWind);
-    });
-    windContra.appendChild(btnContra);
-
-    // vento a favor (direita)
-    const btnFavor = document.createElement('button');
-    btnFavor.textContent = v;
-    btnFavor.className = 'wind-button wind-favor';
-    btnFavor.addEventListener('click', () => {
-      selectedWind = { valor: v, lado: 'favor' };
-      atualizarAngulo();
-      destacarBotao(selectedWind);
-    });
-    windFavor.appendChild(btnFavor);
-  }
-}
-
-function destacarBotao(wind) {
-  document.querySelectorAll('.wind-button').forEach(b => {
-    b.classList.remove('active-favor', 'active-contra');
-  });
-  if (!wind) return;
-
-  const container = wind.lado === 'favor' ? windFavor : windContra;
-  for(const btn of container.children) {
-    if (btn.textContent == wind.valor) {
-      btn.classList.add(wind.lado === 'favor' ? 'active-favor' : 'active-contra');
-      break;
-    }
-  }
-}
-
-criarRulerSegments();
-criarBotoesVento();
-
-</script>
+  <script src="calculo.js"></script>
 </body>
 </html>
