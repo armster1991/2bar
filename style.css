@@ -163,12 +163,13 @@ body {
 
 /* Container da régua */
 #regua-container {
-  position: absolute;
-  bottom: 40px;
+  position: fixed;
+  bottom: 20px; /* Era 40px */
   left: 50%;
   transform: translateX(-50%);
   width: 800px;
   height: 40px;
+  z-index: 10;
 }
 
 #regua {
