@@ -70,7 +70,6 @@ function criarBotaoVento(valor, tipo) {
   else {
     botao.style.margin = "0 auto";
     botao.style.marginTop = "10px";
-    botao.classList.add("vento-zero");
     document.getElementById("resultado-container").appendChild(botao);
   }
 }
@@ -78,53 +77,9 @@ function criarBotaoVento(valor, tipo) {
 function calcular() {
   if (distanciaSelecionada === null || ventoSelecionado === null || !mobileSelecionado) return;
 
-  // Distância em pixels → ângulo base
-  const distanciaEmAngulo = Math.round(distanciaSelecionada / 20); // Cada 20px = 1 ângulo
+  const distanciaEmAngulo = Math.round(distanciaSelecionada / 20);
   let anguloBase = 90 - distanciaEmAngulo;
 
-  // Ajuste por vento
   let ajusteVento = 0;
   if (tipoVento === "favor") {
     ajusteVento = calcularAjusteVento(anguloBase, ventoSelecionado);
-    anguloBase += ajusteVento;
-  } else if (tipoVento === "contra") {
-    ajusteVento = calcularAjusteVento(anguloBase, ventoSelecionado);
-    anguloBase -= ajusteVento;
-  }
-
-  // Ajuste por Mobile
-  anguloBase = ajustarPorMobile(anguloBase, mobileSelecionado);
-
-  // Verificação de limites
-  let anguloFinal = Math.round(anguloBase);
-  if (anguloFinal < 1 || anguloFinal > 89) {
-    anguloResultado.classList.add("alerta");
-    anguloResultado.textContent = `⚠️ ${pad(anguloFinal)} ⚠️`;
-  } else {
-    anguloResultado.classList.remove("alerta");
-    anguloResultado.textContent = pad(anguloFinal);
-  }
-}
-
-// Função para ajustar por Mobile
-function ajustarPorMobile(angulo, mobile) {
-  switch (mobile) {
-    case "armor": return angulo;
-    case "asate": return angulo + 0.05;
-    case "mage": return angulo - 0.05;
-    case "raon": return angulo + 0.1;
-    default: return angulo;
-  }
-}
-
-// Função para calcular o ajuste de vento baseado no ângulo
-function calcularAjusteVento(angulo, vento) {
-  if (angulo >= 80) return vento * 0.5;     // banpao 1/2 sd
-  else if (angulo >= 70) return vento * 1;  // banpao 1 sd
-  else return vento * 0.65;                 // extrapolação para ângulos menores
-}
-
-// Função para formatar o ângulo com dois dígitos
-function pad(n) {
-  return n.toString().padStart(2, '0');
-}
