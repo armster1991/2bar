@@ -1,6 +1,6 @@
 /* style.css */
 
-/* fonte Orbitron */
+/* Fonte Orbitron */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
 
 html, body {
@@ -16,23 +16,155 @@ html, body {
 
 .frame-container {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: 800px; height: 600px;
+  width: 800px;
+  height: 600px;
   background: #000;
   overflow: hidden;
 }
 
-/* cantos da “mira” */
-.corner {
-  position: absolute;
-}
-.corner .corner-h, .corner .corner-v {
+/* Cantos da mira */
+.corner { position: absolute; }
+.corner .corner-h,
+.corner .corner-v {
   background: orange;
   position: absolute;
 }
-.corner.top-left       .corner-h { top: 0; left: 0;  width: 20px; height: 6px; }
-.corner.top-left       .corner-v { top: 0; left: 0;  width: 6px;  height: 20px; }
-.corner.top-right      .corner-h { top: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
-.corner.top-right      .corner-v { top: 0; right: 0; width: 6px;  height: 20px; }
-.corner.bottom-left    .corner-h { bottom: 0; left: 0; width: 20px;
+
+/* Top Left */
+.corner.top-left .corner-h { top: 0; left: 0; width: 20px; height: 6px; }
+.corner.top-left .corner-v { top: 0; left: 0; width: 6px;  height: 20px; }
+
+/* Top Right */
+.corner.top-right .corner-h { top: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
+.corner.top-right .corner-v { top: 0; right: 0; width: 6px;  height: 20px; }
+
+/* Bottom Left */
+.corner.bottom-left .corner-h { bottom: 0; left: 0; width: 20px; height: 6px; }
+.corner.bottom-left .corner-v { bottom: 0; left: 0; width: 6px;  height: 20px; transform: translateY(-20px); }
+
+/* Bottom Right */
+.corner.bottom-right .corner-h { bottom: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
+.corner.bottom-right .corner-v { bottom: 0; right: 0; width: 6px;  height: 20px; transform: translateY(-20px); }
+
+/* Alerta de Mobile */
+#alert-mobile {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: yellow;
+  animation: pulse-yellow 1s infinite;
+}
+
+/* Dropdown de Mobile */
+#mobile-select {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  outline: none;
+}
+
+/* Resultado do ângulo */
+#angle-result {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 64px;
+  letter-spacing: 4px;
+  color: #0ff;
+}
+
+/* Quando fora do range */
+#angle-result.out-of-range {
+  color: red;
+}
+
+/* Containers de vento */
+.winds-container {
+  position: absolute;
+  top: 180px;
+  bottom: 80px;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  overflow: hidden;
+}
+.winds-container.left  { left: 10px; }
+.winds-container.right { right: 10px; }
+
+/* Botões de vento */
+.wind-button {
+  font-size: 14px;
+  padding: 4px;
+  user-select: none;
+  cursor: default;
+  transition: color 0.2s;
+}
+.wind-favor   { color: #0f0; }
+.wind-against { color: #f00; }
+
+/* Animações ao "ativo" */
+.wind-button:hover.wind-favor,
+.wind-button.selected.wind-favor {
+  animation: pulse-green 1s infinite;
+}
+.wind-button:hover.wind-against,
+.wind-button.selected.wind-against {
+  animation: pulse-red 1s infinite;
+}
+
+/* Régua */
+.ruler {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 40px;
+  background: #222;
+  display: flex;
+  border: 1px solid #444;
+  box-sizing: border-box;
+  cursor: crosshair;
+}
+.ruler-segment {
+  flex: 1;
+  border-left: 1px solid #333;
+  height: 100%;
+  background: #222;
+  box-sizing: border-box;
+}
+.ruler-segment:first-child {
+  border-left: none;
+}
+.ruler-segment.active {
+  background: #0ff;
+}
+
+/* Keyframes de pulso */
+@keyframes pulse-yellow {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+@keyframes pulse-green {
+  0%, 100% { text-shadow: 0 0 2px #0f0; }
+  50%      { text-shadow: 0 0 10px #0f0; }
+}
+@keyframes pulse-red {
+  0%, 100% { text-shadow: 0 0 2px #f00; }
+  50%      { text-shadow: 0 0 10px #f00; }
+}
