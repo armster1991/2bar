@@ -59,7 +59,9 @@ function criarBotaoVento(valor, tipo) {
     ventoSelecionado = valor;
     tipoVento = tipo;
     document.querySelectorAll(".vento").forEach(b => b.classList.remove("ativo-verde", "ativo-vermelho"));
-    botao.classList.add(tipo === "favor" ? "ativo-verde" : tipo === "contra" ? "ativo-vermelho" : "");
+    if (tipo === "favor") botao.classList.add("ativo-verde");
+    else if (tipo === "contra") botao.classList.add("ativo-vermelho");
+    else botao.classList.add("ativo-verde"); // vento 0 tratado como neutro/favorável
     calcular();
   });
 
@@ -67,9 +69,12 @@ function criarBotaoVento(valor, tipo) {
   else if (tipo === "contra") ventoContra.appendChild(botao);
   else {
     botao.style.margin = "0 auto";
+    botao.style.marginTop = "10px";
+    botao.classList.add("vento-zero");
     document.getElementById("resultado-container").appendChild(botao);
   }
 }
+
 function calcular() {
   if (distanciaSelecionada === null || ventoSelecionado === null || !mobileSelecionado) return;
 
