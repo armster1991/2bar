@@ -96,3 +96,18 @@ body {
   50% { background-color: #990000; }
   100% { background-color: #ff0000; }
 }
+
+#moldura-neon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  border: 6px solid #ff6600;
+  border-radius: 8px;
+  box-shadow: 0 0 12px #ff6600, 0 0 24px #ff6600 inset;
+  pointer-events: none;
+  z-index: 1;
+}
