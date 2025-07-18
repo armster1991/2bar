@@ -1,142 +1,38 @@
-body {
+/* style.css */
+
+/* fonte Orbitron */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+
+html, body {
   margin: 0;
-  background-color: #0a0a0a;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #111;
   font-family: 'Orbitron', sans-serif;
   color: #fff;
+}
+
+.frame-container {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px; height: 600px;
+  background: #000;
   overflow: hidden;
 }
 
-#alerta-mobile {
-  text-align: center;
-  font-size: 20px;
-  color: yellow;
-  animation: pulse 1s infinite;
-  margin-top: 10px;
-  z-index: 10;
-  position: relative;
-}
-
-#resultado-container {
+/* cantos da “mira” */
+.corner {
   position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 48px;
-  z-index: 10;
 }
-
-#angulo-resultado.alerta {
-  color: red;
-}
-
-#menu-mobile {
+.corner .corner-h, .corner .corner-v {
+  background: orange;
   position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background-color: #111;
-  padding: 5px 10px;
-  border-radius: 5px;
 }
-
-#ventos-container {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.vento-coluna {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.vento {
-  width: 80px;
-  height: 30px;
-  text-align: center;
-  line-height: 30px;
-  border-radius: 5px;
-  background-color: #333;
-  transition: background-color 0.2s, transform 0.2s;
-  user-select: none;
-}
-
-.vento:hover {
-  cursor: pointer;
-  transform: scale(1.05);
-  z-index: 5;
-}
-
-.vento.ativo-verde {
-  background-color: #00ff00;
-  animation: pulse-verde 1s infinite;
-}
-
-.vento.ativo-vermelho {
-  background-color: #ff0000;
-  animation: pulse-vermelho 1s infinite;
-}
-
-#regua-container {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-#regua {
-  width: 800px;
-  height: 40px;
-  background-color: #222;
-  display: flex;
-}
-
-.regua-segmento {
-  flex: 1;
-  background-color: #444;
-  transition: background-color 0.1s;
-}
-
-.regua-segmento.ativo {
-  background-color: #00ffff;
-}
-
-#moldura-neon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 800px;
-  height: 600px;
-  transform: translate(-50%, -50%);
-  box-sizing: border-box;
-  border: 6px solid #ff6600;
-  border-radius: 8px;
-  box-shadow: 0 0 12px #ff6600, 0 0 24px #ff6600 inset;
-  pointer-events: none;
-  z-index: 1;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
-
-@keyframes pulse-verde {
-  0% { background-color: #00ff00; }
-  50% { background-color: #009900; }
-  100% { background-color: #00ff00; }
-}
-
-@keyframes pulse-vermelho {
-  0% { background-color: #ff0000; }
-  50% { background-color: #990000; }
-  100% { background-color: #ff0000; }
-}
+.corner.top-left       .corner-h { top: 0; left: 0;  width: 20px; height: 6px; }
+.corner.top-left       .corner-v { top: 0; left: 0;  width: 6px;  height: 20px; }
+.corner.top-right      .corner-h { top: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
+.corner.top-right      .corner-v { top: 0; right: 0; width: 6px;  height: 20px; }
+.corner.bottom-left    .corner-h { bottom: 0; left: 0; width: 20px;
