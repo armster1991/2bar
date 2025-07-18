@@ -1,170 +1,203 @@
-/* style.css */
-
-/* Fonte Orbitron */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
-
-html, body {
+body {
   margin: 0;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
   overflow: hidden;
-  background: #111;
   font-family: 'Orbitron', sans-serif;
-  color: #fff;
+  background: #0e0e0e;
+  color: #ffffff;
+  position: relative;
 }
 
-.frame-container {
+#alerta-mobile {
+  color: yellow;
+  text-align: center;
+  font-size: 18px;
+  margin-top: 20px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+#resultado-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+#resultado-angulo {
+  font-size: 48px;
+}
+
+#resultado-info {
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+/* Moldura de mira */
+.mira {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   width: 800px;
   height: 600px;
-  background: #000;
-  overflow: hidden;
+  margin-top: -300px;
+  margin-left: -400px;
+  pointer-events: none;
 }
 
-/* Cantos da mira */
-.corner { position: absolute; }
-.corner .corner-h,
-.corner .corner-v {
-  background: orange;
+.canto {
+  width: 6px;
+  height: 6px;
+  background-color: #ff5e00;
   position: absolute;
 }
 
-/* Top Left */
-.corner.top-left .corner-h { top: 0; left: 0; width: 20px; height: 6px; }
-.corner.top-left .corner-v { top: 0; left: 0; width: 6px;  height: 20px; }
+.canto-esquerdo-superior {
+  top: 0;
+  left: 0;
+  box-shadow: 0 0 0 3px #ff5e00;
+}
 
-/* Top Right */
-.corner.top-right .corner-h { top: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
-.corner.top-right .corner-v { top: 0; right: 0; width: 6px;  height: 20px; }
+.canto-direito-superior {
+  top: 0;
+  right: 0;
+  box-shadow: 0 0 0 3px #ff5e00;
+}
 
-/* Bottom Left */
-.corner.bottom-left .corner-h { bottom: 0; left: 0; width: 20px; height: 6px; }
-.corner.bottom-left .corner-v { bottom: 0; left: 0; width: 6px;  height: 20px; transform: translateY(-20px); }
+.canto-esquerdo-inferior {
+  bottom: 0;
+  left: 0;
+  box-shadow: 0 0 0 3px #ff5e00;
+}
 
-/* Bottom Right */
-.corner.bottom-right .corner-h { bottom: 0; right: 0; width: 20px; height: 6px; transform: translateX(-20px); }
-.corner.bottom-right .corner-v { bottom: 0; right: 0; width: 6px;  height: 20px; transform: translateY(-20px); }
+.canto-direito-inferior {
+  bottom: 0;
+  right: 0;
+  box-shadow: 0 0 0 3px #ff5e00;
+}
 
-/* Alerta de Mobile */
-#alert-mobile {
+/* Botões de seleção de Mobile */
+#selecionar-mobile {
   position: absolute;
-  top: 20px;
+  top: 100px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 20px;
-  color: yellow;
-  animation: pulse-yellow 1s infinite;
+  display: flex;
+  gap: 20px;
 }
 
-/* Dropdown de Mobile */
-#mobile-select {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #222;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 16px;
-  outline: none;
+.mobile-btn {
+  width: 60px;
+  height: auto;
+  cursor: pointer;
+  filter: brightness(0.8);
+  transition: transform 0.2s, filter 0.2s;
 }
 
-/* Resultado do ângulo */
-#angle-result {
+.mobile-btn:hover,
+.mobile-btn.selecionado {
+  filter: brightness(1.2);
+  animation: pulse-mobile 1s infinite;
+  transform: scale(1.1);
+}
+
+@keyframes pulse-mobile {
+  0% { box-shadow: 0 0 10px #ffffff; }
+  50% { box-shadow: 0 0 20px #00ffff; }
+  100% { box-shadow: 0 0 10px #ffffff; }
+}
+/* Colunas de vento */
+.vento-coluna {
   position: absolute;
   top: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 64px;
-  letter-spacing: 4px;
-  color: #0ff;
-}
-
-/* Quando fora do range */
-#angle-result.out-of-range {
-  color: red;
-}
-
-/* Containers de vento */
-.winds-container {
-  position: absolute;
-  top: 180px;
-  bottom: 80px;
-  width: 80px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  overflow: hidden;
+  gap: 6px;
 }
-.winds-container.left  { left: 10px; }
-.winds-container.right { right: 10px; }
 
-/* Botões de vento */
-.wind-button {
+#vento-contra {
+  left: 20px;
+}
+
+#vento-favor {
+  right: 20px;
+}
+
+.vento-botao {
+  width: 40px;
+  height: 25px;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  line-height: 25px;
+  cursor: pointer;
   font-size: 14px;
-  padding: 4px;
-  user-select: none;
-  cursor: default;
-  transition: color 0.2s;
-}
-.wind-favor   { color: #0f0; }
-.wind-against { color: #f00; }
-
-/* Animações ao "ativo" */
-.wind-button:hover.wind-favor,
-.wind-button.selected.wind-favor {
-  animation: pulse-green 1s infinite;
-}
-.wind-button:hover.wind-against,
-.wind-button.selected.wind-against {
-  animation: pulse-red 1s infinite;
+  transition: all 0.2s ease;
 }
 
-/* Régua */
-.ruler {
+.vento-botao:hover,
+.vento-botao.selecionado {
+  animation: pulse-vento 1s infinite;
+  font-weight: bold;
+}
+
+.vento-botao.verde:hover,
+.vento-botao.verde.selecionado {
+  background-color: #00ff00;
+}
+
+.vento-botao.vermelho:hover,
+.vento-botao.vermelho.selecionado {
+  background-color: #ff0000;
+}
+
+@keyframes pulse-vento {
+  0% { box-shadow: 0 0 4px rgba(255,255,255,0.2); }
+  50% { box-shadow: 0 0 12px rgba(255,255,255,0.8); }
+  100% { box-shadow: 0 0 4px rgba(255,255,255,0.2); }
+}
+
+/* Container da régua */
+#regua-container {
   position: absolute;
-  bottom: 20px;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   width: 800px;
   height: 40px;
-  background: #222;
-  display: flex;
-  border: 1px solid #444;
-  box-sizing: border-box;
-  cursor: crosshair;
-}
-.ruler-segment {
-  flex: 1;
-  border-left: 1px solid #333;
-  height: 100%;
-  background: #222;
-  box-sizing: border-box;
-}
-.ruler-segment:first-child {
-  border-left: none;
-}
-.ruler-segment.active {
-  background: #0ff;
 }
 
-/* Keyframes de pulso */
-@keyframes pulse-yellow {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.6; }
+#regua {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  border: 2px solid #444;
 }
-@keyframes pulse-green {
-  0%, 100% { text-shadow: 0 0 2px #0f0; }
-  50%      { text-shadow: 0 0 10px #0f0; }
+
+#regua div {
+  flex: 1;
+  height: 100%;
+  background: #111;
+  transition: background 0.1s;
 }
-@keyframes pulse-red {
-  0%, 100% { text-shadow: 0 0 2px #f00; }
-  50%      { text-shadow: 0 0 10px #f00; }
+
+#regua div.aceso {
+  background: #00ffff;
+}
+
+/* Ângulo fora dos limites */
+.resultado-invalido {
+  color: red !important;
+  animation: alerta 1s infinite;
+}
+
+@keyframes alerta {
+  0% { text-shadow: 0 0 4px red; }
+  50% { text-shadow: 0 0 12px red; }
+  100% { text-shadow: 0 0 4px red; }
 }
