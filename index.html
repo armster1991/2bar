@@ -1,40 +1,49 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Ângulo - 2 Barras</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>2 Bars Aiming Ruler</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="alerta-mobile">⚠️ Selecione seu Mobile ⚠️</div>
+  <div class="frame-container">
+    <!-- cantos da mira -->
+    <div class="corner top-left">
+      <div class="corner-h"></div><div class="corner-v"></div>
+    </div>
+    <div class="corner top-right">
+      <div class="corner-h"></div><div class="corner-v"></div>
+    </div>
+    <div class="corner bottom-left">
+      <div class="corner-h"></div><div class="corner-v"></div>
+    </div>
+    <div class="corner bottom-right">
+      <div class="corner-h"></div><div class="corner-v"></div>
+    </div>
 
-  <div id="resultado-container">
-    <span id="angulo-resultado">--</span>
-  </div>
-
-  <div id="menu-mobile">
-    <label for="mobile-select">Escolha o Mobile:</label>
+    <!-- alerta e seleção de Mobile -->
+    <div id="alert-mobile">Selecione seu Mobile</div>
     <select id="mobile-select">
-      <option value="">--</option>
-      <option value="armor">Armor</option>
-      <option value="asate">A.Sate</option>
-      <option value="mage">Mage</option>
-      <option value="raon">Raon</option>
+      <option value="">-- Escolha seu Mobile --</option>
+      <option value="Armor">Armor</option>
+      <option value="A.Sate">A.Sate</option>
+      <option value="Mage">Mage</option>
+      <option value="Raon">Raon</option>
     </select>
-  </div>
 
-  <div id="ventos-container">
-    <div id="ventos-contra" class="vento-coluna"></div>
-    <div id="ventos-favor" class="vento-coluna"></div>
-  </div>
+    <!-- resultado do ângulo -->
+    <div id="angle-result">00</div>
 
-  <div id="regua-container">
-    <div id="regua"></div>
-  </div>
+    <!-- ventos contra (esquerda) -->
+    <div id="winds-left" class="winds-container left"></div>
+    <!-- ventos a favor (direita) -->
+    <div id="winds-right" class="winds-container right"></div>
 
-  <div id="moldura-neon"></div>
+    <!-- régua de medição -->
+    <div id="ruler" class="ruler"></div>
+  </div>
 
   <script src="calculo.js"></script>
 </body>
