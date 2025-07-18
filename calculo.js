@@ -1,4 +1,3 @@
-// Seletores globais
 const regua = document.getElementById('regua');
 const resultadoAngulo = document.getElementById('resultado-angulo');
 const resultadoInfo = document.getElementById('resultado-info');
@@ -11,40 +10,38 @@ let distanciaSelecionada = null;
 let ventoSelecionado = null;
 let mobileSelecionado = null;
 
-// Correções por Mobile
-const mobileCorrecao = {
+const correcaoMobiles = {
   armor: 0,
   mage: -0.05,
-  asate: +0.05,
-  raon: +0.1
+  asate: 0.05,
+  raon: 0.1
 };
 
-// Renderiza régua
+// Criar 20 divisões na régua
 for (let i = 0; i < 20; i++) {
   const div = document.createElement('div');
   regua.appendChild(div);
 }
 
-// Eventos da régua
+// Evento de mouse na régua
 regua.addEventListener('mousemove', (e) => {
   const bounds = regua.getBoundingClientRect();
   const posX = e.clientX - bounds.left;
   const total = 800;
-  const porcentagem = Math.min(Math.max(posX, 0), total);
-  distanciaSelecionada = porcentagem;
+  const posClamped = Math.min(Math.max(posX, 0), total);
+  distanciaSelecionada = posClamped;
 
-  // Acende barras
   const segmentos = regua.querySelectorAll('div');
-  const acenderIndex = Math.floor((porcentagem / total) * 20);
+  const ativo = Math.floor((posClamped / total) * 20);
   segmentos.forEach((el, idx) => {
-    el.classList.toggle('aceso', idx <= acenderIndex);
+    el.classList.toggle('aceso', idx <= ativo);
   });
 
   tentaCalcular();
 });
 
-// Renderiza botões de vento
-function criaBotaoVento(valor, tipo) {
+// Criar botões de vento (1-26 de cada lado + 0)
+function criarBotaoVento(valor, tipo) {
   const btn = document.createElement('div');
   btn.classList.add('vento-botao', tipo === 'favor' ? 'verde' : 'vermelho');
   btn.textContent = valor;
@@ -62,15 +59,15 @@ function criaBotaoVento(valor, tipo) {
 }
 
 for (let i = 1; i <= 26; i++) {
-  ventoContra.appendChild(criaBotaoVento(i, 'contra'));
-  ventoFavor.appendChild(criaBotaoVento(i, 'favor'));
+  ventoContra.appendChild(criarBotaoVento(i, 'contra'));
+  ventoFavor.appendChild(criarBotaoVento(i, 'favor'));
 }
-ventoFavor.appendChild(criaBotaoVento(0, 'neutro')); // zero no centro
+ventoFavor.appendChild(criarBotaoVento(0, 'neutro'));
 
-// Seleção de Mobile
+// Mobile
 mobileBtns.forEach(btn => {
   btn.addEventListener('click', () => {
-    mobileBtns.forEach(m => m.classList.remove('selecionado'));
+    mobileBtns.forEach(b => b.classList.remove('selecionado'));
     btn.classList.add('selecionado');
     mobileSelecionado = btn.id;
     alertaMobile.style.display = 'none';
@@ -78,52 +75,47 @@ mobileBtns.forEach(btn => {
   });
 });
 
-// Função principal de cálculo
+// Cálculo principal
 function tentaCalcular() {
-  if (distanciaSelecionada === null || ventoSelecionado === null || mobileSelecionado === null) {
-    return;
-  }
+  if (distanciaSelecionada === null || ventoSelecionado === null || mobileSelecionado === null) return;
 
-  // Cálculo de distância em "ângulos"
-  const distanciaPixel = distanciaSelecionada; // 800px = 1 sd
-  const anguloDistancia = (distanciaPixel / 800) * 20; // 20 = 100px = 5 ang -> 400px = 20 ang -> 800px = 40 ang
+  const distanciaPx = distanciaSelecionada;
+  const distanciaAngulo = (distanciaPx / 800) * 40; // cada 20px = 1 ângulo
+  const anguloBase = 90 - distanciaAngulo;
 
   // Correção de vento
-  const anguloBase = 90 - anguloDistancia;
+  const coef = getWindCoeficiente(anguloBase);
+  let ajusteVento = ventoSelecionado.valor * coef;
 
-  let fatorVento = 1;
-  const anguloReal = anguloBase + (
-    ventoSelecionado.tipo === 'favor' ? 
-      getWindAjuste(anguloBase, ventoSelecionado.valor) : 
-      -getWindAjuste(anguloBase, ventoSelecionado.valor)
-  );
-
-  // Correção do mobile
-  const ajusteMobile = mobileCorrecao[mobileSelecionado] || 0;
-  let anguloFinal = anguloReal + ajusteMobile;
-
-  // Formatação e validação
-  anguloFinal = Math.round(anguloFinal);
-  let invalido = false;
-  if (anguloFinal < 1 || anguloFinal > 89) {
-    invalido = true;
+  if (ventoSelecionado.tipo === 'contra') {
+    anguloFinal = anguloBase - ajusteVento;
+  } else if (ventoSelecionado.tipo === 'favor') {
+    anguloFinal = anguloBase + ajusteVento;
+  } else {
+    anguloFinal = anguloBase;
   }
 
-  // Atualiza tela
-  resultadoAngulo.textContent = `${invalido ? '⚠️' : ''}${pad(anguloFinal)}°${invalido ? '⚠️' : ''}`;
+  // Ajuste por Mobile
+  anguloFinal += correcaoMobiles[mobileSelecionado] || 0;
+
+  // Arredondamento
+  let anguloFinalArredondado = Math.round(anguloFinal);
+  let invalido = (anguloFinalArredondado < 1 || anguloFinalArredondado > 89);
+
+  // Exibir resultados
+  resultadoAngulo.textContent = `${invalido ? '⚠️' : ''}${formatar(anguloFinalArredondado)}°${invalido ? '⚠️' : ''}`;
   resultadoAngulo.classList.toggle('resultado-invalido', invalido);
-
-  resultadoInfo.textContent = `Distância: ${Math.round(distanciaPixel)}px | Vento: ${ventoSelecionado.tipo === 'neutro' ? '0' : ventoSelecionado.tipo + ' ' + ventoSelecionado.valor}`;
+  resultadoInfo.textContent = `Distância: ${Math.round(distanciaPx)}px | Vento: ${ventoSelecionado.tipo} ${ventoSelecionado.valor}`;
 }
 
-// Ajuste de vento baseado no gráfico (ban pao)
-function getWindAjuste(anguloBase, windStrength) {
-  if (anguloBase >= 80) return windStrength * 0.5;       // Ban pao 1/2 sd
-  if (anguloBase >= 70) return windStrength * 1;         // Ban pao 1 sd
-  return windStrength * 1.2; // Fora do ideal, compensação bruta
+// Coeficiente de vento baseado no ângulo (ban pao)
+function getWindCoeficiente(angulo) {
+  if (angulo >= 80) return 0.5;  // ½ SD - Wind Chart
+  if (angulo >= 70) return 1.0;  // 1 SD
+  return 1.2; // não recomendado abaixo de 70, mas forçamos com peso maior
 }
 
-// Formatação de 2 dígitos
-function pad(n) {
+// Formatador de ângulos
+function formatar(n) {
   return n < 10 ? '0' + n : n;
 }
