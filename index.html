@@ -1,48 +1,43 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>2 Bars Aiming Ruler</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Ângulo</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="frame-container">
-    <!-- cantos da mira -->
-    <div class="corner top-left">
-      <div class="corner-h"></div><div class="corner-v"></div>
-    </div>
-    <div class="corner top-right">
-      <div class="corner-h"></div><div class="corner-v"></div>
-    </div>
-    <div class="corner bottom-left">
-      <div class="corner-h"></div><div class="corner-v"></div>
-    </div>
-    <div class="corner bottom-right">
-      <div class="corner-h"></div><div class="corner-v"></div>
-    </div>
+  <div id="alerta-mobile">⚠️ Selecione seu Mobile ⚠️</div>
 
-    <!-- alerta e seleção de Mobile -->
-    <div id="alert-mobile">Selecione seu Mobile</div>
-    <select id="mobile-select">
-      <option value="">-- Escolha seu Mobile --</option>
-      <option value="Armor">Armor</option>
-      <option value="A.Sate">A.Sate</option>
-      <option value="Mage">Mage</option>
-      <option value="Raon">Raon</option>
-    </select>
+  <div id="resultado-container">
+    <div id="resultado-angulo">--</div>
+    <div id="resultado-info">Distância: -- | Vento: --</div>
+  </div>
 
-    <!-- resultado do ângulo -->
-    <div id="angle-result">00</div>
+  <!-- Moldura central de mira -->
+  <div class="mira">
+    <div class="canto canto-esquerdo-superior"></div>
+    <div class="canto canto-direito-superior"></div>
+    <div class="canto canto-esquerdo-inferior"></div>
+    <div class="canto canto-direito-inferior"></div>
+  </div>
 
-    <!-- ventos contra (esquerda) -->
-    <div id="winds-left" class="winds-container left"></div>
-    <!-- ventos a favor (direita) -->
-    <div id="winds-right" class="winds-container right"></div>
+  <!-- Botões de seleção de Mobile -->
+  <div id="selecionar-mobile">
+    <img src="Armor.png" class="mobile-btn" id="armor">
+    <img src="A.SATE.png" class="mobile-btn" id="asate">
+    <img src="Mage.png" class="mobile-btn" id="mage">
+    <img src="Raon.png" class="mobile-btn" id="raon">
+  </div>
 
-    <!-- régua de medição -->
-    <div id="ruler" class="ruler"></div>
+  <!-- Botões de vento -->
+  <div id="vento-contra" class="vento-coluna"></div>
+  <div id="vento-favor" class="vento-coluna"></div>
+
+  <!-- Régua de distância -->
+  <div id="regua-container">
+    <div id="regua"></div>
   </div>
 
   <script src="calculo.js"></script>
