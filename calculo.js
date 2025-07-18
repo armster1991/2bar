@@ -1,85 +1,109 @@
-const regua = document.getElementById("regua");
-const anguloResultado = document.getElementById("angulo-resultado");
-const alertaMobile = document.getElementById("alerta-mobile");
-const mobileSelect = document.getElementById("mobile-select");
-const ventoContra = document.getElementById("ventos-contra");
-const ventoFavor = document.getElementById("ventos-favor");
+// calculo.js
 
-let distanciaSelecionada = null;
-let ventoSelecionado = null;
-let tipoVento = null;
-let mobileSelecionado = null;
+// variáveis de estado
+let selectedDistancePx = 0;
+let selectedWind = 0;
+let selectedMobile = '';
 
-// Cria segmentos da régua
+// referências aos elementos
+const ruler = document.getElementById('ruler');
+const angleEl = document.getElementById('angle-result');
+const alertMobile = document.getElementById('alert-mobile');
+const mobileSelect = document.getElementById('mobile-select');
+const windsLeft = document.getElementById('winds-left');
+const windsRight = document.getElementById('winds-right');
+
+// popula 26 ventos “contra” (esquerda) e 26 ventos “a favor” (direita)
+for (let i = 1; i <= 26; i++) {
+  // vento contra
+  const btnC = document.createElement('div');
+  btnC.className = 'wind-button wind-against';
+  btnC.dataset.wind = -i;
+  btnC.textContent = `${i}°`;
+  windsLeft.appendChild(btnC);
+  // vento a favor
+  const btnF = document.createElement('div');
+  btnF.className = 'wind-button wind-favor';
+  btnF.dataset.wind = i;
+  btnF.textContent = `${i}°`;
+  windsRight.appendChild(btnF);
+}
+
+// popula 20 segmentos da régua
 for (let i = 0; i < 20; i++) {
-  const segmento = document.createElement("div");
-  segmento.classList.add("regua-segmento");
-  regua.appendChild(segmento);
+  const seg = document.createElement('div');
+  seg.className = 'ruler-segment';
+  seg.dataset.index = i;
+  ruler.appendChild(seg);
 }
 
-regua.addEventListener("mousemove", (e) => {
-  const rect = regua.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  distanciaSelecionada = Math.min(Math.max(x, 0), 800);
-  atualizarRegua(distanciaSelecionada);
-  calcular();
-});
-
-function atualizarRegua(x) {
-  const segmentos = document.querySelectorAll(".regua-segmento");
-  const limite = Math.floor((x / 800) * 20);
-  segmentos.forEach((seg, i) => {
-    seg.classList.toggle("ativo", i <= limite);
+// função que “acende” segmentos até a posição x
+function updateSegments(x) {
+  const rect = ruler.getBoundingClientRect();
+  const total = rect.width;
+  const perSeg = total / 20;
+  const count = Math.ceil(Math.max(0, Math.min(x, total)) / perSeg);
+  document.querySelectorAll('.ruler-segment').forEach(seg => {
+    const idx = Number(seg.dataset.index) + 1;
+    if (idx <= count) seg.classList.add('active');
+    else seg.classList.remove('active');
   });
 }
 
-mobileSelect.addEventListener("change", () => {
-  mobileSelecionado = mobileSelect.value;
-  if (mobileSelecionado) {
-    alertaMobile.style.display = "none";
-    calcular();
-  }
+// event: movimento do mouse sobre a régua
+ruler.addEventListener('mousemove', e => {
+  const rect = ruler.getBoundingClientRect();
+  selectedDistancePx = e.clientX - rect.left;
+  updateSegments(selectedDistancePx);
+  calculateAndDisplay();
 });
 
-// Cria botões de vento
-for (let i = 0; i <= 26; i++) {
-  if (i > 0) {
-    criarBotaoVento(i, "favor");
-    criarBotaoVento(i, "contra");
-  } else {
-    criarBotaoVento(i, "neutro");
+// event: hover em qualquer botão de vento
+document.body.addEventListener('mouseenter', e => {
+  const t = e.target;
+  if (t.classList.contains('wind-button') && t.dataset.wind != null) {
+    // marca seleção
+    selectedWind = Number(t.dataset.wind);
+    document.querySelectorAll('.wind-button.selected').forEach(b => b.classList.remove('selected'));
+    t.classList.add('selected');
+    calculateAndDisplay();
   }
-}
+}, true);
 
-function criarBotaoVento(valor, tipo) {
-  const botao = document.createElement("div");
-  botao.classList.add("vento");
-  botao.textContent = `${valor}`;
-  botao.addEventListener("mouseenter", () => {
-    ventoSelecionado = valor;
-    tipoVento = tipo;
-    document.querySelectorAll(".vento").forEach(b => b.classList.remove("ativo-verde", "ativo-vermelho"));
-    if (tipo === "favor") botao.classList.add("ativo-verde");
-    else if (tipo === "contra") botao.classList.add("ativo-vermelho");
-    else botao.classList.add("ativo-verde"); // vento 0 tratado como neutro/favorável
-    calcular();
-  });
+// event: seleção de Mobile
+mobileSelect.addEventListener('change', e => {
+  selectedMobile = e.target.value;
+  if (selectedMobile) alertMobile.style.display = 'none';
+  calculateAndDisplay();
+});
 
-  if (tipo === "favor") ventoFavor.appendChild(botao);
-  else if (tipo === "contra") ventoContra.appendChild(botao);
-  else {
-    botao.style.margin = "0 auto";
-    botao.style.marginTop = "10px";
-    document.getElementById("resultado-container").appendChild(botao);
+// cálculo do ângulo
+function calculateAndDisplay() {
+  if (!selectedMobile) return;    // só após escolher Mobile
+
+  // 1) distância → ângulo bruto
+  const rawAngle = 90 - (selectedDistancePx / 20);
+
+  // 2) fator vento
+  let windStrength = 0;
+  if (rawAngle >= 80 && rawAngle <= 90) {
+    const w = Math.abs(selectedWind);
+    windStrength = (w <= 10 ? 0.6 : w <= 25 ? 0.65 : 0.6);
+  } else if (rawAngle >= 70 && rawAngle < 80) {
+    windStrength = 1.0;
   }
+
+  // 3) correção de vento
+  const windCorr = Math.floor(Math.abs(selectedWind) * windStrength);
+  let finalAngle = rawAngle + (selectedWind > 0 ? windCorr : -windCorr);
+
+  // 4) arredonda e formata
+  finalAngle = Math.round(finalAngle);
+  const outOfRange = finalAngle < 1 || finalAngle > 89;
+  const txt = outOfRange
+    ? `⚠ ${String(finalAngle).padStart(2, '0')} ⚠`
+    : String(finalAngle).padStart(2, '0');
+
+  angleEl.textContent = txt;
+  angleEl.classList.toggle('out-of-range', outOfRange);
 }
-
-function calcular() {
-  if (distanciaSelecionada === null || ventoSelecionado === null || !mobileSelecionado) return;
-
-  const distanciaEmAngulo = Math.round(distanciaSelecionada / 20);
-  let anguloBase = 90 - distanciaEmAngulo;
-
-  let ajusteVento = 0;
-  if (tipoVento === "favor") {
-    ajusteVento = calcularAjusteVento(anguloBase, ventoSelecionado);
